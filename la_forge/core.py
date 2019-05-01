@@ -10,6 +10,10 @@ from astropy.table import Table
 from . import utils
 
 
+from .bokehVis import serverOut
+import subprocess
+
+
 class Core(object):
     """
     An object that stores the parameters and chains from a bayesian analysis
@@ -246,6 +250,11 @@ class Core(object):
             raise ValueError(err_msg)
 
         self.fancy_par_names = names_list
+
+    def create_bokeh_output(self):
+        serverOut.EZ_Start(self)
+
+
 
 ##### Methods to act on Core objects
 
