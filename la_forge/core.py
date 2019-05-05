@@ -9,6 +9,9 @@ from astropy.table import Table
 
 from . import utils
 
+from .bokehVis import serverOut
+import subprocess
+
 ### Convenience function to load a Core object
 
 def load_Core(filepath):
@@ -17,8 +20,6 @@ def load_Core(filepath):
         core.filepath = filepath
     return core
 
-from .bokehVis import serverOut
-import subprocess
 
 
 class Core(object):

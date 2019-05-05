@@ -27,6 +27,17 @@ histogram_bins = 50
 columnDict = {}
 plotDict = {}
 
+l = layout([],sizing_mode='scale_width')
+
+#Bokeh Widgets------------------------------------------------------------------
+menuDropdown = None
+parameterSelector = None
+pulsarSelector = None
+plotsPerLine = None
+goButton = None
+
+
+
 #TODO: Add ability to remove burned values
 def _create_columns():
     global columnDict
@@ -83,14 +94,59 @@ def _setup_server(core):
 
 #Stuff to start server from python
 def _make_document(doc):
-    plotList = []
-    for param in currentCore.params[:1]:
-        plotList.append(plotDict.get(param))
+    global menuDropdown
+    global menuDropdown
+    global parameterSelector
+    global pulsarSelector
+    global plotsPerLine
+    global goButton
 
-    l = layout(plotList,sizing_mode='scale_width')
-    doc.title = 'Testing'
+    global l
+
+    menuDropdown = widgets.Select(title='What to view:',value='All line plots',
+                                  options=['All line plots','All histograms',
+                                           'Single parameter','Single Pulsar'])
+
+    menuDropdown.on_change('value', selectMode)
+
+    allParams = currentCore.params
+    psr_names = [p.split('_')[0] for p in allParams if p[5] in ['+','-']]
+    psr_names = np.unique(psr_names)
+    psr_names.sort()
+
+    parameterSelector = widgets.Select(title='Which Parameter:',
+                                       value=allParams[0],options=allParams)
+
+    pulsarSelector = widgets.Select(title='Which Pulsar:',value=psr_names[0],
+                                    options=psr_names.tolist())
+
+    plotsPerLine = widgets.Slider(title='Plots per line',start=1,end=8,value=5)
+
+    goButton = widgets.Button(label='Go!',button_type='success')
+
+    layoutList = [[menuDropdown,Spacer(),plotsPerLine,goButton],
+                  [Spacer()]]
+
+    l = layout(layoutList,sizing_mode='scale_width')
+    doc.title = 'La Forge Core Output'
     doc.add_root(l)
 
+
+def selectMode(attrname, old, new):
+    global l
+    toChange = l.children[0].children[2]
+    if menuDropdown.value == 'All line plots':
+        if type(toChange) != type(Spacer()):
+            toChange = Spacer()
+    elif menuDropdown.value == 'All histograms':
+        if type(toChange) != type(Spacer()):
+            toChange = Spacer()
+    elif menuDropdown.value == 'Single parameter':
+        if toChange != parameterSelector:
+            toChange = parameterSelector
+    elif menuDropdown.value == 'Single Pulsar':
+        if toChange != pulsarSelector:
+            toChange = pulsarSelector
 
 def _launch():
     print('Launching server. Go to \"local host:5000\" to see visualization')
