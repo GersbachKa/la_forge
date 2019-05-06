@@ -9,8 +9,7 @@ from astropy.table import Table
 
 from . import utils
 
-from .bokehVis import serverOut
-import subprocess
+from .bokehVis.bokeh_server import start_server
 
 ### Convenience function to load a Core object
 
@@ -259,9 +258,6 @@ class Core(object):
 
         self.fancy_par_names = names_list
 
-    def create_bokeh_output(self):
-        serverOut.EZ_Start(self)
-
     def save(self, filepath):
         self.filepath = filepath
         with open(filepath, "wb") as fout:
@@ -271,6 +267,9 @@ class Core(object):
         with open(filepath, "rb") as fin:
             self = pickle.load(fin)
 
+
+    def create_bokeh_output(self,port=5000):
+        start_server(self,port)
 
 
 
