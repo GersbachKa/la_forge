@@ -98,7 +98,7 @@ def make_server(doc):
         ppl = plotsPerLine.value
         templist = []
         for param in currentCore.params:
-            templist.append(genHistPlot(param,showAll=False))
+            templist.append(genHistPlot(param))
             if len(templist)==ppl:
                 l.children.append(row(templist,sizing_mode='scale_width'))
                 templist = []
