@@ -9,7 +9,7 @@ from astropy.table import Table
 
 from . import utils
 
-from .bokehVis.bokeh_server import start_server
+from .bokehVis.bokeh_server import start_server, set_histogram_bins
 
 ### Convenience function to load a Core object
 
@@ -270,6 +270,9 @@ class Core(object):
 
     def create_bokeh_output(self,port=5000):
         start_server(self,port)
+
+    def set_bokeh_histogram_bins(self,bins=50):
+        set_histogram_bins(bins)
 
 
 
