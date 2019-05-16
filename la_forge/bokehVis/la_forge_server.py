@@ -147,31 +147,48 @@ def make_server(doc):
             del l.children[2:]
 
         paramIndex = parameterMultiSelect.active
-        lineList = []
-        histList = []
-        for i in paramIndex:
-            param = allParams[i]
-            lineList.append(genLinePlot(param))
-            histList.append(genHistPlot(param))
 
-        ppl = plotsPerLine.value
-        templist = []
-        for plot in lineList:
-            templist.append(plot)
-            if len(templist)==ppl:
-                l.children.append(row(templist,sizing_mode='scale_width'))
-                templist = []
-        if len(templist) != 0:
-            l.children.append(row(templist,sizing_mode='scale_width'))
+        if len(paramIndex)==2:
+            param1 = allParams[paramIndex[0]]
+            param2 = allParams[paramIndex[1]]
+
+            hex = gen2dHist(param1,param2)
+            p1Line = genLinePlot(param1)
+            p1Hist = genHistPlot(param1,square=True)
+            p2Line = genLinePlot(param2)
+            p2Hist = genHistPlot(param2,square=True)
+
+            l.children.append(row([p1Hist,column([p1Line,p2Line],sizing_mode='scale_width')],sizing_mode='scale_width'))
+            l.children.append(row([hex,p2Hist],sizing_mode='scale_width'))
+
+        else:
+            lineList = []
+            histList = []
+            for i in paramIndex:
+                param = allParams[i]
+                lineList.append(genLinePlot(param))
+                histList.append(genHistPlot(param))
+
+            ppl = plotsPerLine.value
             templist = []
+            for plot in lineList:
+                templist.append(plot)
+                if len(templist)==ppl:
+                    l.children.append(row(templist,sizing_mode='scale_width'))
+                    templist = []
 
-        for plot in histList:
-            templist.append(plot)
-            if len(templist)==ppl:
+            if len(templist) != 0:
                 l.children.append(row(templist,sizing_mode='scale_width'))
                 templist = []
-        if len(templist) != 0:
-            l.children.append(row(templist,sizing_mode='scale_width'))
+
+            for plot in histList:
+                templist.append(plot)
+                if len(templist)==ppl:
+                    l.children.append(row(templist,sizing_mode='scale_width'))
+                    templist = []
+
+            if len(templist) != 0:
+                l.children.append(row(templist,sizing_mode='scale_width'))
 
 
 
@@ -200,7 +217,7 @@ def make_server(doc):
         linefig = figure(title=parameter+" chain",
                          x_axis_label = 'Iterations',
                          y_axis_label = 'Value',
-                         plot_height = 300, plot_width = 900,
+                         plot_height = 450, plot_width = 900,
                          tools = "pan,reset,box_zoom")
         linefig.line(source = line_src, x='x', y='y')
 
@@ -216,12 +233,12 @@ def make_server(doc):
         histfig = figure(title=parameter+" posterior",
                          x_axis_label = 'Value',
                          y_axis_label = 'Number of iterations',
-                         plot_height = 300, plot_width = 900,
+                         plot_height = 450, plot_width = 900,
                          tools = "pan,reset,box_zoom")
         if square:
             histfig.plot_height=900
 
-        histfig.line(source = hist_src, x='x', y='y')
+        histfig.step(source = hist_src, x='x', y='y')
 
         return histfig
 
@@ -237,7 +254,8 @@ def make_server(doc):
                          tools="pan,reset,box_zoom")
         hexbin.background_fill_color = '#440154'
         hexbin.grid.visible = False
-        hexbin.hexbin(x=x1,y=y1,size=.06)
+        sz = (np.max(y1)-np.min(y1))/100
+        hexbin.hexbin(x=x1,y=y1,size=sz)
 
         return hexbin
 
